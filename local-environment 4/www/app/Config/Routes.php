@@ -22,3 +22,5 @@ $routes->get('/post/create', 'PostController::create');
 $routes->get('/post/edit/(:num)', 'PostController::edit/$1');
 
 $routes->get('/logout', 'AuthController::logout');
+
+$routes->post('/posts', 'PostController::store');
