@@ -27,4 +27,12 @@ class AuthController extends BaseController
     {
         return redirect()->back()->withInput();
     }
+
+    public function logout()
+    {
+        session()->destroy();
+
+        return redirect()->to('/');
+    }
+
 }
