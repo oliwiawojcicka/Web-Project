@@ -11,6 +11,7 @@
     <div>
         <a href="/home">Home</a>
         <a href="/post/create">Create Post</a>
+        <a href="/profile" class="active">Profile</a>
         <a href="/logout">Logout</a>
     </div>
 </nav>
@@ -18,17 +19,17 @@
 <main class="feed-container">
     <section class="create-post-box">
         <h2>Your Profile</h2>
-        <p>This page will allow users to update their username, password and profile picture.</p>
+        <p>Manage your public information and keep your LSMiniSocial account up to date.</p>
 
         <form>
-            <label>Username</label>
-            <input type="text" placeholder="Your username">
+            <label for="username">Username</label>
+            <input id="username" type="text" placeholder="Your username">
 
-            <label>Email</label>
-            <input type="email" placeholder="your.email@students.salle.url.edu" readonly>
+            <label for="email">Email</label>
+            <input id="email" type="email" placeholder="your.email@students.salle.url.edu" readonly>
 
-            <label>Profile picture</label>
-            <input type="file">
+            <label for="picture">Profile picture</label>
+            <input id="picture" type="file">
 
             <button type="submit">Save changes</button>
         </form>
