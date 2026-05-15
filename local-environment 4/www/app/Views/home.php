@@ -9,9 +9,9 @@
 <nav class="navbar">
     <h1>LSMiniSocial</h1>
     <div>
-        <a href="/home" class="active">Home</a>
-        <a href="/post/create">Create Post</a>
-        <a href="/profile">Profile</a>
+        <a href="/home" class="<?= uri_string() === 'home' ? 'active' : '' ?>">Home</a>
+        <a href="/post/create" class="<?= uri_string() === 'post/create' ? 'active' : '' ?>">Create Post</a>
+        <a href="/profile" class="<?= uri_string() === 'profile' ? 'active' : '' ?>">Profile</a>
         <a href="/logout">Logout</a>
     </div>
 </nav>
@@ -21,14 +21,15 @@
         <h2>Create a new post</h2>
         <p>Share an update with the La Salle community directly from your homepage.</p>
 
-        <form action="#" method="post" enctype="multipart/form-data">
-            <textarea name="content" placeholder="What are you thinking about?"></textarea>
+        <form action="/posts" method="post" enctype="multipart/form-data">
+            <label for="home-content">Post content</label>
+            <textarea id="home-content" name="content" required placeholder="What are you thinking about?"></textarea>
 
             <label for="home-image">Optional image</label>
             <input id="home-image" type="file" name="image">
 
             <div class="post-actions">
-                <button type="button">Improve with AI</button>
+                <button type="button" class="secondary-button">Improve with AI</button>
                 <button type="submit">Publish post</button>
             </div>
         </form>
@@ -50,7 +51,7 @@
             </div>
 
             <p class="post-content">
-                This is an example post for the LSMiniSocial feed. Posts will be ordered by newest first.
+                This is an example post for the LSMiniSocial feed. Real posts will be loaded from the database and ordered by newest first.
             </p>
 
             <div class="post-image-placeholder">
@@ -60,8 +61,16 @@
             <p class="post-stats">3 likes · 2 comments</p>
 
             <div class="post-actions">
-                <button type="button">♡ Like</button>
-                <button type="button">💬 Comment</button>
+                <button type="button" class="secondary-button">♡ Like</button>
+                <button type="button" class="secondary-button">💬 Comment</button>
+            </div>
+
+            <div class="owner-actions">
+                <a href="/post/edit/1" class="button-link secondary-button">Edit</a>
+
+                <form action="#" method="post">
+                    <button type="button" class="danger-button">Delete</button>
+                </form>
             </div>
 
             <div class="comments-box">
@@ -72,8 +81,13 @@
                     <p>Nice post!</p>
                 </div>
 
+                <div class="comment">
+                    <strong>student_22</strong>
+                    <p>Welcome to the community feed.</p>
+                </div>
+
                 <form action="#" method="post" class="comment-form">
-                    <input type="text" name="comment" placeholder="Write a comment...">
+                    <input type="text" name="comment" required placeholder="Write a comment...">
                     <button type="submit">Send</button>
                 </form>
             </div>
@@ -95,8 +109,8 @@
             <p class="post-stats">1 like · 0 comments</p>
 
             <div class="post-actions">
-                <button type="button">♡ Like</button>
-                <button type="button">💬 Comment</button>
+                <button type="button" class="secondary-button">♡ Like</button>
+                <button type="button" class="secondary-button">💬 Comment</button>
             </div>
 
             <div class="comments-box">
@@ -104,7 +118,7 @@
                 <p class="empty-comments">No comments yet.</p>
 
                 <form action="#" method="post" class="comment-form">
-                    <input type="text" name="comment" placeholder="Write a comment...">
+                    <input type="text" name="comment" required placeholder="Write a comment...">
                     <button type="submit">Send</button>
                 </form>
             </div>

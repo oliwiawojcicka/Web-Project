@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Create Post | LSMiniSocial</title>
+    <title>Edit Post | LSMiniSocial</title>
     <link rel="stylesheet" href="<?= base_url('assets/css/home.css') ?>">
 </head>
 <body>
@@ -18,21 +18,19 @@
 
 <main class="feed-container">
     <section class="create-post-box">
-        <h2>Create a new post</h2>
-        <p>Share an update with the La Salle community. You can also improve your text with AI before publishing.</p>
+        <h2>Edit post</h2>
+        <p>Update the content of your post. Only the owner of the post will be allowed to edit it.</p>
 
-        <form action="/posts" method="post" enctype="multipart/form-data">
+        <form action="#" method="post" enctype="multipart/form-data">
             <label for="content">Post content</label>
-            <textarea id="content" name="content" required placeholder="What would you like to share?"></textarea>
+            <textarea id="content" name="content" required>This is the current content of post #<?= esc($postId) ?>.</textarea>
 
-            <label for="image">Optional image</label>
+            <label for="image">Change image optional</label>
             <input id="image" type="file" name="image">
 
-            <div class="ai-suggestion-box" id="ai-suggestion-box">
+            <div class="ai-suggestion-box">
                 <h3>AI suggestion</h3>
-                <p id="ai-suggestion-text">
-                    Your improved post suggestion will appear here.
-                </p>
+                <p>Your improved post suggestion will appear here.</p>
 
                 <div class="post-actions">
                     <button type="button" class="secondary-button">Accept suggestion</button>
@@ -42,7 +40,8 @@
 
             <div class="post-actions">
                 <button type="button" class="secondary-button">Improve with AI</button>
-                <button type="submit">Publish post</button>
+                <button type="submit">Save changes</button>
+                <a href="/home" class="button-link secondary-button">Cancel</a>
             </div>
         </form>
     </section>

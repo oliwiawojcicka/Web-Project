@@ -15,6 +15,10 @@ $routes->get('/sign-in', 'AuthController::signIn');
 $routes->post('/sign-in', 'AuthController::signInPost');
 
 $routes->get('/home', 'Home::index');
+
 $routes->get('/profile', 'ProfileController::index');
+
 $routes->get('/post/create', 'PostController::create');
+$routes->get('/post/edit/(:num)', 'PostController::edit/$1');
+
 $routes->get('/logout', 'AuthController::logout');

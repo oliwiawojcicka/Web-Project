@@ -9,9 +9,9 @@
 <nav class="navbar">
     <h1>LSMiniSocial</h1>
     <div>
-        <a href="/home">Home</a>
-        <a href="/post/create">Create Post</a>
-        <a href="/profile" class="active">Profile</a>
+        <a href="/home" class="<?= uri_string() === 'home' ? 'active' : '' ?>">Home</a>
+        <a href="/post/create" class="<?= uri_string() === 'post/create' ? 'active' : '' ?>">Create Post</a>
+        <a href="/profile" class="<?= uri_string() === 'profile' ? 'active' : '' ?>">Profile</a>
         <a href="/logout">Logout</a>
     </div>
 </nav>

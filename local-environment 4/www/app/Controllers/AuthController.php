@@ -13,7 +13,14 @@ class AuthController extends BaseController
 
     public function signUpPost()
     {
-        return redirect()->back()->withInput();
+        session()->set([
+            'user_id' => 1,
+            'username' => $this->request->getPost('username') ?: 'oliwia',
+            'email' => $this->request->getPost('email'),
+            'isLoggedIn' => true,
+        ]);
+
+        return redirect()->to('/home');
     }
 
     public function signIn()
@@ -25,7 +32,13 @@ class AuthController extends BaseController
 
     public function signInPost()
     {
-        return redirect()->back()->withInput();
+        session()->set([
+            'user_id' => 1,
+            'username' => 'oliwia',
+            'isLoggedIn' => true,
+        ]);
+
+        return redirect()->to('/home');
     }
 
     public function logout()

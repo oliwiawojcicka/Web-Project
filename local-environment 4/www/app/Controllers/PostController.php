@@ -10,4 +10,12 @@ class PostController extends BaseController
             'title' => 'Create Post'
         ]);
     }
+
+    public function edit($id)
+    {
+        return view('posts/edit', [
+            'title' => 'Edit Post',
+            'postId' => $id
+        ]);
+    }
 }
