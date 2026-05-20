@@ -24,17 +24,17 @@ class Filters extends BaseFilters
      * [filter_name => classname]
      * or [filter_name => [classname1, classname2, ...]]
      */
-    public array $aliases = [
-        'csrf'          => CSRF::class,
-        'toolbar'       => DebugToolbar::class,
-        'honeypot'      => Honeypot::class,
-        'invalidchars'  => InvalidChars::class,
-        'secureheaders' => SecureHeaders::class,
-        'cors'          => Cors::class,
-        'forcehttps'    => ForceHTTPS::class,
-        'pagecache'     => PageCache::class,
-        'performance'   => PerformanceMetrics::class,
-    ];
+//    public array $aliases = [
+//        'csrf'          => CSRF::class,
+//        'toolbar'       => DebugToolbar::class,
+//        'honeypot'      => Honeypot::class,
+//        'invalidchars'  => InvalidChars::class,
+//        'secureheaders' => SecureHeaders::class,
+//        'cors'          => Cors::class,
+//        'forcehttps'    => ForceHTTPS::class,
+//        'pagecache'     => PageCache::class,
+//        'performance'   => PerformanceMetrics::class,
+//    ];
 
     /**
      * List of special required filters.
@@ -107,4 +107,15 @@ class Filters extends BaseFilters
      * @var array<string, array<string, list<string>>>
      */
     public array $filters = [];
+    public array $aliases = [
+        'csrf'          => \CodeIgniter\Filters\CSRF::class,
+        'toolbar'       => \CodeIgniter\Filters\DebugToolbar::class,
+        'honeypot'      => \CodeIgniter\Filters\Honeypot::class,
+        'invalidchars'  => \CodeIgniter\Filters\InvalidChars::class,
+        'secureheaders' => \CodeIgniter\Filters\SecureHeaders::class,
+        'forcehttps'    => \CodeIgniter\Filters\ForceHTTPS::class,
+        'pagecache'     => \CodeIgniter\Filters\PageCache::class,
+        'performance'   => \CodeIgniter\Filters\PerformanceMetrics::class, // Ten, który wyrzucał błąd
+        'auth'          => \App\Filters\AuthFilter::class,                 // Nasz własny strażnik
+    ];
 }

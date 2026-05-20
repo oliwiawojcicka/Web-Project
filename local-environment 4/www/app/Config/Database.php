@@ -25,15 +25,16 @@ class Database extends Config
      * @var array<string, mixed>
      */
     public array $default = [
-        'DSN'          => '',
-        'hostname'     => '',
-        'username'     => '',
-        'password'     => '',
-        'database'     => '',
-        'DBDriver'     => 'MySQLi',
-        'DBPrefix'     => '',
-        'pConnect'     => false,
-        'DBDebug'      => true,
+
+            'DSN'          => '',
+            'hostname'     => 'mysql',
+            'username'     => 'pw2user',
+            'password'     => 'pw2pass',
+            'database'     => 'project_db',
+            'DBDriver'     => 'MySQLi',
+            'DBPrefix'     => '',
+            'pConnect'     => false,
+            'DBDebug'      => true,
         'charset'      => 'utf8mb4',
         'DBCollat'     => 'utf8mb4_general_ci',
         'swapPre'      => '',
