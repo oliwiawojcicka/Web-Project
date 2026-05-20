@@ -17,35 +17,40 @@
 </nav>
 
 <main class="feed-container">
+
+    <?php if (session()->getFlashdata('error')): ?>
+        <div class="alert-error">
+            <?= esc(session()->getFlashdata('error')) ?>
+        </div>
+    <?php endif; ?>
+
+    <?php if (session()->getFlashdata('success')): ?>
+        <div class="alert-success">
+            <?= esc(session()->getFlashdata('success')) ?>
+        </div>
+    <?php endif; ?>
+
     <section class="create-post-box">
         <h2>Create a new post</h2>
         <p>Share an update with the La Salle community. You can also improve your text with AI before publishing.</p>
 
         <form action="/posts" method="post" enctype="multipart/form-data">
             <label for="content">Post content</label>
-            <textarea id="content" name="content" required placeholder="What would you like to share?"></textarea>
+            <textarea id="content" name="content" required placeholder="What would you like to share?"><?= old('content') ?></textarea>
 
             <label for="image">Optional image</label>
             <input id="image" type="file" name="image">
 
-            <div class="ai-suggestion-box" id="ai-suggestion-box">
-                <h3>AI suggestion</h3>
-                <p id="ai-suggestion-text">
-                    Your improved post suggestion will appear here.
-                </p>
-
-                <div class="post-actions">
-                    <button type="button" class="secondary-button">Accept suggestion</button>
-                    <button type="button" class="secondary-button">Reject suggestion</button>
-                </div>
-            </div>
-
             <div class="post-actions">
-                <button type="button" class="secondary-button">Improve with AI</button>
+                <button type="button" class="secondary-button" data-ai-improve data-target="content">
+                    Improve with AI
+                </button>
                 <button type="submit">Publish post</button>
             </div>
         </form>
     </section>
 </main>
+
+<script src="<?= base_url('assets/js/ai-improve.js') ?>"></script>
 </body>
 </html>

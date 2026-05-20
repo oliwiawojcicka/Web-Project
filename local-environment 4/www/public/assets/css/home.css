@@ -155,6 +155,11 @@ button:hover,
     box-shadow: 0 10px 22px rgba(79, 70, 229, 0.25);
 }
 
+button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
 .secondary-button {
     background: #eef2ff;
     color: #3730a3;
@@ -164,6 +169,26 @@ button:hover,
 .secondary-button:hover {
     background: #e0e7ff;
     box-shadow: none;
+}
+
+/* Alerts */
+
+.alert-error,
+.alert-success {
+    border-radius: 14px;
+    padding: 14px 18px;
+    margin-bottom: 18px;
+    font-weight: 700;
+}
+
+.alert-error {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.alert-success {
+    background: #dcfce7;
+    color: #166534;
 }
 
 /* Feed heading */
@@ -224,17 +249,26 @@ button:hover,
     margin: 18px 0;
 }
 
+.post-image,
 .post-image-placeholder {
     width: 100%;
-    min-height: 180px;
     border-radius: 18px;
+    margin: 18px 0;
+}
+
+.post-image {
+    max-height: 420px;
+    object-fit: cover;
+}
+
+.post-image-placeholder {
+    min-height: 180px;
     background: #eef2ff;
     color: #4f46e5;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 700;
-    margin: 18px 0;
 }
 
 .post-actions {
@@ -244,8 +278,34 @@ button:hover,
     flex-wrap: wrap;
 }
 
-.post-actions button {
+.post-actions button,
+.post-actions .button-link {
     margin-top: 0;
+}
+
+/* Owner actions */
+
+.owner-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+}
+
+.owner-actions form {
+    margin: 0;
+}
+
+.danger-button {
+    background: #fee2e2;
+    color: #991b1b;
+    box-shadow: none;
+}
+
+.danger-button:hover {
+    background: #fecaca;
+    color: #7f1d1d;
+    box-shadow: none;
 }
 
 /* Comments */
@@ -340,7 +400,8 @@ button:hover,
         flex-direction: column;
     }
 
-    .post-actions {
+    .post-actions,
+    .owner-actions {
         flex-direction: column;
     }
 
@@ -348,44 +409,4 @@ button:hover,
     .button-link {
         width: 100%;
     }
-}
-.owner-actions {
-    display: flex;
-    gap: 12px;
-    margin-top: 14px;
-    flex-wrap: wrap;
-}
-
-.owner-actions form {
-    margin: 0;
-}
-
-.danger-button {
-    background: #fee2e2;
-    color: #991b1b;
-    box-shadow: none;
-}
-
-.danger-button:hover {
-    background: #fecaca;
-    color: #7f1d1d;
-    box-shadow: none;
-}
-
-.alert-error,
-.alert-success {
-    border-radius: 14px;
-    padding: 14px 18px;
-    margin-bottom: 18px;
-    font-weight: 700;
-}
-
-.alert-error {
-    background: #fee2e2;
-    color: #991b1b;
-}
-
-.alert-success {
-    background: #dcfce7;
-    color: #166534;
 }

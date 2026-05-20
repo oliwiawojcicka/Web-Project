@@ -15,6 +15,7 @@ $routes->get('/sign-in', 'AuthController::signIn');
 $routes->post('/sign-in', 'AuthController::signInPost');
 
 $routes->get('/home', 'Home::index');
+$routes->get('/home', 'HomeController::index', ['filter' => 'auth']);
 
 $routes->get('/profile', 'ProfileController::index');
 
@@ -24,3 +25,4 @@ $routes->get('/post/edit/(:num)', 'PostController::edit/$1');
 $routes->get('/logout', 'AuthController::logout');
 
 $routes->post('/posts', 'PostController::store');
+$routes->post('/ai/improve', 'AIController::improve');

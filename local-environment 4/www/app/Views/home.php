@@ -42,7 +42,9 @@
             <input id="home-image" type="file" name="image">
 
             <div class="post-actions">
-                <button type="button" class="secondary-button">Improve with AI</button>
+                <button type="button" class="secondary-button" data-ai-improve data-target="home-content">
+                    Improve with AI
+                </button>
                 <button type="submit">Publish post</button>
             </div>
         </form>
@@ -133,5 +135,7 @@
         <?php endif; ?>
     </section>
 </main>
+
+<script src="<?= base_url('assets/js/ai-improve.js') ?>"></script>
 </body>
 </html>
