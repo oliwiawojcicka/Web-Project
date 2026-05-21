@@ -8,6 +8,7 @@ use App\Models\CommentModel;
 
 class Home extends BaseController
 {
+    // Load the main dashboard feed
     public function index()
     {
         if (! session()->get('isLoggedIn')) {
@@ -19,12 +20,14 @@ class Home extends BaseController
         $commentModel = new CommentModel();
         $userId       = (int) session()->get('user_id');
 
+        // Fetch all posts with author details
         $posts = $postModel
             ->select('posts.*, users.username, users.profile_pic')
             ->join('users', 'users.id = posts.user_id', 'left')
             ->orderBy('posts.created_at', 'DESC')
             ->findAll();
 
+        // Attach likes, comments, and user interaction status to each post
         foreach ($posts as &$post) {
             $post['likes_count']    = $likeModel->countForPost((int) $post['id']);
             $post['comments_count'] = $commentModel->countForPost((int) $post['id']);

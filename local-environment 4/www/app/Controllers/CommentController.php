@@ -7,8 +7,7 @@ use App\Models\PostModel;
 
 class CommentController extends BaseController
 {
-    // ─── API: GET /posts/{id}/comments ───────────────────────────────────────
-
+    // Fetch all comments for a specific post
     public function index(int $postId)
     {
         if (! session()->get('isLoggedIn')) {
@@ -25,8 +24,7 @@ class CommentController extends BaseController
         return $this->response->setJSON($commentModel->getForPost($postId));
     }
 
-    // ─── API: POST /posts/{id}/comments ─────────────────────────────────────
-
+    // Save a new comment on a post
     public function store(int $postId)
     {
         if (! session()->get('isLoggedIn')) {
@@ -52,6 +50,7 @@ class CommentController extends BaseController
             'content' => $content,
         ], true);
 
+        // Fetch the newly created comment along with the author's username
         $comment = $commentModel
             ->select('comments.*, users.username')
             ->join('users', 'users.id = comments.user_id', 'left')
@@ -64,8 +63,7 @@ class CommentController extends BaseController
         ]);
     }
 
-    // ─── API: DELETE /comments/{id} ──────────────────────────────────────────
-
+    // Delete a user's comment
     public function delete(int $id)
     {
         if (! session()->get('isLoggedIn')) {
@@ -79,6 +77,7 @@ class CommentController extends BaseController
             return $this->response->setStatusCode(404)->setJSON(['error' => 'Comment not found.']);
         }
 
+        // Ensure users can only delete their own comments
         if ((int) $comment['user_id'] !== (int) session()->get('user_id')) {
             return $this->response->setStatusCode(403)->setJSON(['error' => 'You can only delete your own comments.']);
         }

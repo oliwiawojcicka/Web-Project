@@ -7,8 +7,7 @@ use App\Models\PostModel;
 
 class LikeController extends BaseController
 {
-    // ─── API: POST /posts/{id}/like ──────────────────────────────────────────
-
+    // Add a like to a post
     public function like(int $postId)
     {
         if (! session()->get('isLoggedIn')) {
@@ -35,8 +34,7 @@ class LikeController extends BaseController
         ]);
     }
 
-    // ─── API: DELETE /posts/{id}/like ────────────────────────────────────────
-
+    // Remove a like from a post
     public function unlike(int $postId)
     {
         if (! session()->get('isLoggedIn')) {

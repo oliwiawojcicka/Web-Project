@@ -6,8 +6,7 @@ use App\Models\UserModel;
 
 class AuthController extends BaseController
 {
-    // ─── GET /sign-up ────────────────────────────────────────────────────────
-
+    // Show the sign-up form
     public function signUp()
     {
         if (session()->get('isLoggedIn')) {
@@ -17,8 +16,7 @@ class AuthController extends BaseController
         return view('auth/sign_up', ['title' => 'Sign Up']);
     }
 
-    // ─── POST /sign-up ───────────────────────────────────────────────────────
-
+    // Handle new user registration
     public function signUpPost()
     {
         $email          = trim((string) $this->request->getPost('email'));
@@ -27,7 +25,7 @@ class AuthController extends BaseController
         $username       = trim((string) $this->request->getPost('username'));
         $errors         = [];
 
-        // Email format
+        // Validate email format and domain
         if (! filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $errors['email'] = 'The email address is not valid.';
         } elseif (! preg_match('/@(students\.salle\.url\.edu|ext\.salle\.url\.edu|salle\.url\.edu)$/', $email)) {
@@ -39,14 +37,13 @@ class AuthController extends BaseController
             }
         }
 
-        // Password
+        // Validate password strength
         if (strlen($password) < 8) {
             $errors['password'] = 'The password must contain at least 8 characters.';
         } elseif (! preg_match('/[A-Z]/', $password) || ! preg_match('/[a-z]/', $password) || ! preg_match('/[0-9]/', $password)) {
             $errors['password'] = 'The password must contain both upper and lower case letters and numbers.';
         }
 
-        // Repeat password
         if ($password !== $repeatPassword) {
             $errors['repeat_password'] = 'Passwords do not match.';
         }
@@ -55,7 +52,7 @@ class AuthController extends BaseController
             return redirect()->back()->withInput()->with('errors', $errors);
         }
 
-        // Default username from email
+        // Use part of the email as the default username if none is provided
         if ($username === '') {
             $username = explode('@', $email)[0];
         }
@@ -80,8 +77,7 @@ class AuthController extends BaseController
         return redirect()->to('/sign-in')->with('success', 'Account created successfully. You can now sign in.');
     }
 
-    // ─── GET /sign-in ────────────────────────────────────────────────────────
-
+    // Show the sign-in form
     public function signIn()
     {
         if (session()->get('isLoggedIn')) {
@@ -91,8 +87,7 @@ class AuthController extends BaseController
         return view('auth/sign_in', ['title' => 'Sign In']);
     }
 
-    // ─── POST /sign-in ───────────────────────────────────────────────────────
-
+    // Handle login attempt
     public function signInPost()
     {
         $email    = trim((string) $this->request->getPost('email'));
@@ -107,12 +102,14 @@ class AuthController extends BaseController
         $userModel = new UserModel();
         $user      = $userModel->where('email', $email)->first();
 
+        // Check if user exists and password is correct
         if (! $user || ! password_verify($password, $user['password'])) {
             return redirect()->back()->withInput()->with('errors', [
                 'login' => 'Your email and/or password are incorrect.',
             ]);
         }
 
+        // Set session data
         session()->set([
             'user_id'    => $user['id'],
             'username'   => $user['username'],
@@ -122,8 +119,7 @@ class AuthController extends BaseController
         return redirect()->to('/home');
     }
 
-    // ─── GET /sign-out ───────────────────────────────────────────────────────
-
+    // Log the user out and destroy the session
     public function signOut()
     {
         session()->destroy();

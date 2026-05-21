@@ -8,15 +8,13 @@ use App\Models\CommentModel;
 
 class PostController extends BaseController
 {
-    // ── GET /post/create ──────────────────────────────────────────────────────
-
+    // Show the post creation form
     public function create()
     {
         return view('posts/create', ['title' => 'Create Post']);
     }
 
-    // ── GET /post/edit/{id} ───────────────────────────────────────────────────
-
+    // Show the post edit form
     public function edit(int $id)
     {
         $postModel = new PostModel();
@@ -33,8 +31,7 @@ class PostController extends BaseController
         return view('posts/edit', ['title' => 'Edit Post', 'post' => $post]);
     }
 
-    // ── GET /posts ────────────────────────────────────────────────────────────
-
+    // Fetch all posts (useful for AJAX feeds)
     public function index()
     {
         if (! session()->get('isLoggedIn')) {
@@ -57,8 +54,7 @@ class PostController extends BaseController
         return $this->response->setJSON($posts);
     }
 
-    // ── POST /posts ───────────────────────────────────────────────────────────
-
+    // Save a new post
     public function store()
     {
         if (! session()->get('isLoggedIn')) {
@@ -74,6 +70,7 @@ class PostController extends BaseController
             return redirect()->back()->withInput()->with('error', 'Post content cannot be empty.');
         }
 
+        // Handle optional post image upload
         $imagePath = null;
         $image     = $this->request->getFile('image');
 
@@ -94,8 +91,7 @@ class PostController extends BaseController
         return redirect()->to('/home')->with('success', 'Post created successfully.');
     }
 
-    // ── GET /posts/{id} ───────────────────────────────────────────────────────
-
+    // Fetch details for a single post
     public function show(int $id)
     {
         if (! session()->get('isLoggedIn')) {
@@ -120,8 +116,7 @@ class PostController extends BaseController
         return $this->response->setJSON($post);
     }
 
-    // ── PUT /posts/{id} ───────────────────────────────────────────────────────
-
+    // Update an existing post
     public function update(int $id)
     {
         if (! session()->get('isLoggedIn')) {
@@ -139,8 +134,14 @@ class PostController extends BaseController
             return $this->response->setStatusCode(403)->setJSON(['error' => 'You can only edit your own posts.']);
         }
 
-        $json    = $this->request->getJSON(true);
-        $content = trim((string) ($json['content'] ?? $this->request->getPost('content') ?? ''));
+        $json = null;
+        if (str_contains(strtolower($this->request->getHeaderLine('Content-Type')), 'json')) {
+            $json = $this->request->getJSON(true);
+        }
+
+
+        $rawInput = $this->request->getRawInput();
+        $content  = trim((string) ($json['content'] ?? $rawInput['content'] ?? $this->request->getPost('content') ?? ''));
 
         if ($content === '') {
             if ($this->request->isAJAX() || $json !== null) {
@@ -158,8 +159,7 @@ class PostController extends BaseController
         return redirect()->to('/home')->with('success', 'Post updated successfully.');
     }
 
-    // ── DELETE /posts/{id} ────────────────────────────────────────────────────
-
+    // Delete a post
     public function delete(int $id)
     {
         if (! session()->get('isLoggedIn')) {

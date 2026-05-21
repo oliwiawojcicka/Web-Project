@@ -25,7 +25,7 @@ class LanguageFilter implements FilterInterface
         $detected       = $default;
 
         if ($acceptLanguage) {
-            // Parse: "es-ES,es;q=0.9,en;q=0.8" → ['es', 'en']
+
             preg_match_all('/([a-z]{2})(?:-[A-Z]{2})?(?:;q=[\d.]+)?/i', $acceptLanguage, $matches);
             foreach ($matches[1] as $lang) {
                 $lang = strtolower($lang);

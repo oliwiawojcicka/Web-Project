@@ -7,8 +7,7 @@ use App\Models\PostModel;
 
 class ProfileController extends BaseController
 {
-    // ─── GET /profile ────────────────────────────────────────────────────────
-
+    // Show the user's profile and their posts
     public function index()
     {
         $userId    = (int) session()->get('user_id');
@@ -30,8 +29,7 @@ class ProfileController extends BaseController
         ]);
     }
 
-    // ─── POST /profile ───────────────────────────────────────────────────────
-
+    // Update user profile information
     public function update()
     {
         $userId    = (int) session()->get('user_id');
@@ -46,6 +44,7 @@ class ProfileController extends BaseController
             $errors['username'] = 'Username must not be empty.';
         }
 
+        // Validate new password if the user decides to change it
         if ($password !== '') {
             if (strlen($password) < 8) {
                 $errors['password'] = 'The password must contain at least 8 characters.';
@@ -74,14 +73,13 @@ class ProfileController extends BaseController
 
         $userModel->update($userId, $data);
 
-        // Refresh session username
+        // Refresh the username in the current session
         session()->set('username', $username);
 
         return redirect()->to('/profile')->with('success', 'Profile updated successfully.');
     }
 
-    // ─── POST /profile/delete ────────────────────────────────────────────────
-
+    // Delete the user's account completely
     public function deleteAccount()
     {
         $userId    = (int) session()->get('user_id');

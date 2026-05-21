@@ -13,8 +13,7 @@ class AIController extends BaseController
         $this->aiService = new AIService();
     }
 
-    // ── POST /ai/improve ──────────────────────────────────────────────────────
-
+    // Improve post text using AI
     public function improve()
     {
         if (! session()->get('isLoggedIn')) {
