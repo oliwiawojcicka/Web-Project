@@ -8,7 +8,7 @@
     <?php endif; ?>
 
     <section class="create-post-box">
-        <h2><?= lang('App.creategi_title') ?></h2>
+        <h2><?= lang('App.create_title') ?></h2>
         <p><?= lang('App.create_subtitle') ?></p>
 
         <form action="/posts" method="post" enctype="multipart/form-data">
