@@ -3,6 +3,8 @@
 namespace App\Controllers;
 
 use App\Models\PostModel;
+use App\Models\LikeModel;
+use App\Models\CommentModel;
 
 class Home extends BaseController
 {
@@ -12,7 +14,10 @@ class Home extends BaseController
             return redirect()->to('/sign-in')->with('error', 'You must sign in to access the homepage.');
         }
 
-        $postModel = new PostModel();
+        $postModel    = new PostModel();
+        $likeModel    = new LikeModel();
+        $commentModel = new CommentModel();
+        $userId       = (int) session()->get('user_id');
 
         $posts = $postModel
             ->select('posts.*, users.username, users.profile_pic')
@@ -21,9 +26,10 @@ class Home extends BaseController
             ->findAll();
 
         foreach ($posts as &$post) {
-            $post['likes_count'] = 0;
-            $post['comments_count'] = 0;
-            $post['comments'] = [];
+            $post['likes_count']    = $likeModel->countForPost((int) $post['id']);
+            $post['comments_count'] = $commentModel->countForPost((int) $post['id']);
+            $post['liked_by_user']  = $likeModel->hasLiked($userId, (int) $post['id']);
+            $post['comments']       = $commentModel->getForPost((int) $post['id']);
         }
 
         return view('home', [

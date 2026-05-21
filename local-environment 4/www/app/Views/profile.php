@@ -1,39 +1,83 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Profile | LSMiniSocial</title>
-    <link rel="stylesheet" href="<?= base_url('assets/css/home.css') ?>">
-</head>
-<body>
-<nav class="navbar">
-    <h1>LSMiniSocial</h1>
-    <div>
-        <a href="/home" class="<?= uri_string() === 'home' ? 'active' : '' ?>">Home</a>
-        <a href="/post/create" class="<?= uri_string() === 'post/create' ? 'active' : '' ?>">Create Post</a>
-        <a href="/profile" class="<?= uri_string() === 'profile' ? 'active' : '' ?>">Profile</a>
-        <a href="/logout">Logout</a>
-    </div>
-</nav>
+<?= $this->extend('layouts/base') ?>
 
-<main class="feed-container">
+<?= $this->section('content') ?>
+<div class="feed-container container">
+
+    <?php if (session()->getFlashdata('success')): ?>
+        <div class="alert-success"><?= esc(session()->getFlashdata('success')) ?></div>
+    <?php endif; ?>
+    <?php if (session()->getFlashdata('error')): ?>
+        <div class="alert-error"><?= esc(session()->getFlashdata('error')) ?></div>
+    <?php endif; ?>
+
     <section class="create-post-box">
-        <h2>Your Profile</h2>
-        <p>Manage your public information and keep your LSMiniSocial account up to date.</p>
+        <h2><?= lang('App.profile_title') ?></h2>
 
-        <form>
-            <label for="username">Username</label>
-            <input id="username" type="text" placeholder="Your username">
+        <?php if (! empty($user['profile_pic']) && $user['profile_pic'] !== 'default.png'): ?>
+            <img src="<?= base_url($user['profile_pic']) ?>" alt="Profile picture" class="profile-pic-preview">
+        <?php else: ?>
+            <div class="avatar avatar-large"><?= esc(strtoupper(substr($user['username'] ?? 'U', 0, 1))) ?></div>
+        <?php endif; ?>
 
-            <label for="email">Email</label>
-            <input id="email" type="email" placeholder="your.email@students.salle.url.edu" readonly>
+        <form action="/profile" method="post" enctype="multipart/form-data">
+            <?= csrf_field() ?>
 
-            <label for="picture">Profile picture</label>
-            <input id="picture" type="file">
+            <label for="username"><?= lang('App.label_username') ?></label>
+            <input type="text" id="username" name="username" value="<?= esc($user['username'] ?? '') ?>" required>
+            <?php if (session('errors.username')): ?>
+                <span class="field-error"><?= esc(session('errors.username')) ?></span>
+            <?php endif; ?>
 
-            <button type="submit">Save changes</button>
+            <label for="email"><?= lang('App.label_email_readonly') ?></label>
+            <input type="email" id="email" value="<?= esc($user['email'] ?? '') ?>" readonly>
+
+            <label for="profile_pic"><?= lang('App.label_change_pic') ?></label>
+            <input type="file" id="profile_pic" name="profile_pic" accept="image/*">
+
+            <label for="password"><?= lang('App.label_new_password') ?> <span class="optional">(<?= lang('App.password_hint') ?>)</span></label>
+            <input type="password" id="password" name="password">
+            <?php if (session('errors.password')): ?>
+                <span class="field-error"><?= esc(session('errors.password')) ?></span>
+            <?php endif; ?>
+
+            <div class="post-actions">
+                <button type="submit" class="btn btn-primary"><?= lang('App.btn_save') ?></button>
+            </div>
         </form>
     </section>
-</main>
-</body>
-</html>
+
+    <section class="feed-heading">
+        <h2><?= lang('App.your_posts') ?></h2>
+    </section>
+
+    <section class="posts">
+        <?php if (! empty($posts)): ?>
+            <?php foreach ($posts as $post): ?>
+                <article class="post-card">
+                    <p class="post-content"><?= esc($post['content']) ?></p>
+                    <?php if (! empty($post['image'])): ?>
+                        <img class="post-image" src="<?= base_url($post['image']) ?>" alt="Post image">
+                    <?php endif; ?>
+                    <small style="color:var(--text-muted)"><?= esc($post['created_at']) ?></small>
+                    <div class="post-actions">
+                        <a href="/post/edit/<?= esc($post['id']) ?>" class="btn btn-secondary"><?= lang('App.btn_edit') ?></a>
+                    </div>
+                </article>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <p class="empty-comments"><?= lang('App.no_posts_yet') ?></p>
+        <?php endif; ?>
+    </section>
+
+    <section class="create-post-box danger-zone">
+        <h2><?= lang('App.danger_zone') ?></h2>
+        <p><?= lang('App.danger_desc') ?></p>
+        <form action="/profile/delete" method="post"
+              onsubmit="return confirm('<?= lang('App.confirm_delete_account') ?>')">
+            <?= csrf_field() ?>
+            <button type="submit" class="btn btn-danger"><?= lang('App.btn_delete_account') ?></button>
+        </form>
+    </section>
+
+</div>
+<?= $this->endSection() ?>

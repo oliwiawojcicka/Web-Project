@@ -1,97 +1,57 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const aiButtons = document.querySelectorAll('[data-ai-improve]');
+// AI Improve — used on create.php and edit.php
+(function () {
+    const aiBtn    = document.getElementById('ai-improve-btn');
+    const aiBox    = document.getElementById('ai-suggestion-box');
+    const aiText   = document.getElementById('ai-suggestion-text');
+    const aiAccept = document.getElementById('ai-accept-btn');
+    const aiReject = document.getElementById('ai-reject-btn');
+    const textarea = document.getElementById('content');
 
-    aiButtons.forEach((button) => {
-        button.addEventListener('click', async () => {
-            const targetId = button.dataset.target;
-            const textarea = document.getElementById(targetId);
+    if (!aiBtn || !textarea) return;
 
-            if (!textarea) {
-                return;
+    function csrfHeaders() {
+        return {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            [CSRF_NAME]: CSRF_HASH,
+        };
+    }
+
+    aiBtn.addEventListener('click', async () => {
+        const text = textarea.value.trim();
+        if (!text) { alert('Write something first.'); return; }
+
+        aiBtn.textContent = 'Improving...';
+        aiBtn.disabled    = true;
+
+        try {
+            const res  = await fetch('/ai/improve', {
+                method: 'POST',
+                headers: csrfHeaders(),
+                body: JSON.stringify({ text }),
+            });
+            const data = await res.json();
+
+            if (data.improved_text) {
+                aiText.textContent  = data.improved_text;
+                aiBox.style.display = 'block';
+            } else {
+                alert(data.error ?? 'AI service error.');
             }
-
-            const originalText = textarea.value.trim();
-
-            if (!originalText) {
-                showSuggestion(button, 'Please write something before using AI.', false);
-                return;
-            }
-
-            button.disabled = true;
-            button.textContent = 'Improving...';
-
-            try {
-                const response = await fetch('/ai/improve', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    body: JSON.stringify({
-                        text: originalText
-                    })
-                });
-
-                const data = await response.json();
-
-                if (!response.ok || !data.improved_text) {
-                    showSuggestion(button, data.error || 'AI suggestion is not available yet.', false);
-                    return;
-                }
-
-                showSuggestion(button, data.improved_text, true, textarea);
-            } catch (error) {
-                showSuggestion(button, 'AI service is not connected yet.', false);
-            } finally {
-                button.disabled = false;
-                button.textContent = 'Improve with AI';
-            }
-        });
+        } catch (e) {
+            alert('Network error. Please try again.');
+        } finally {
+            aiBtn.textContent = '✨ Improve with AI';
+            aiBtn.disabled    = false;
+        }
     });
-});
 
-function showSuggestion(button, message, canAccept, textarea = null) {
-    const form = button.closest('form');
-    let box = form.querySelector('.ai-suggestion-box');
+    aiAccept.addEventListener('click', () => {
+        textarea.value      = aiText.textContent;
+        aiBox.style.display = 'none';
+    });
 
-    if (!box) {
-        box = document.createElement('div');
-        box.className = 'ai-suggestion-box';
-        form.insertBefore(box, form.querySelector('.post-actions'));
-    }
-
-    box.innerHTML = `
-        <h3>AI suggestion</h3>
-        <p>${escapeHtml(message)}</p>
-        ${
-        canAccept
-            ? `<div class="post-actions">
-                    <button type="button" class="secondary-button" data-ai-accept>Accept suggestion</button>
-                    <button type="button" class="secondary-button" data-ai-reject>Reject suggestion</button>
-                   </div>`
-            : ''
-    }
-    `;
-
-    const acceptButton = box.querySelector('[data-ai-accept]');
-    const rejectButton = box.querySelector('[data-ai-reject]');
-
-    if (acceptButton && textarea) {
-        acceptButton.addEventListener('click', () => {
-            textarea.value = message;
-            box.remove();
-        });
-    }
-
-    if (rejectButton) {
-        rejectButton.addEventListener('click', () => {
-            box.remove();
-        });
-    }
-}
-
-function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
+    aiReject.addEventListener('click', () => {
+        aiBox.style.display = 'none';
+    });
+})();

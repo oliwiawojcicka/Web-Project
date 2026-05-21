@@ -69,3 +69,9 @@ nb-configuration.xml
 
 # Visual Studio Code
 .vscode/
+# PHP / CodeIgniter
+#-------------------------
+/www/vendor/
+/www/.env
+/www/writable/
+/www/public/uploads/

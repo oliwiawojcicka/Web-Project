@@ -2,17 +2,25 @@
 
 namespace App\Controllers;
 
+use App\Services\AIService;
+
 class AIController extends BaseController
 {
+    private AIService $aiService;
+
+    public function __construct()
+    {
+        $this->aiService = new AIService();
+    }
+
+    // ── POST /ai/improve ──────────────────────────────────────────────────────
+
     public function improve()
     {
         if (! session()->get('isLoggedIn')) {
             return $this->response
                 ->setStatusCode(401)
-                ->setJSON([
-                    'error' => 'You must sign in to use AI improvement.',
-                    'lsm_meta_sync' => true,
-                ]);
+                ->setJSON(['error' => 'You must sign in to use AI improvement.']);
         }
 
         $json = $this->request->getJSON(true);
@@ -21,22 +29,18 @@ class AIController extends BaseController
         if ($text === '') {
             return $this->response
                 ->setStatusCode(400)
-                ->setJSON([
-                    'error' => 'Text is required.',
-                    'lsm_meta_sync' => true,
-                ]);
+                ->setJSON(['error' => 'Text is required.']);
         }
 
-        $improvedText = $this->buildTemporarySuggestion($text);
+        try {
+            $improved = $this->aiService->improve($text);
+        } catch (\Throwable $e) {
+            log_message('error', 'AI improve error: ' . $e->getMessage());
+            return $this->response
+                ->setStatusCode(502)
+                ->setJSON(['error' => 'AI service is currently unavailable. Please try again later.']);
+        }
 
-        return $this->response->setJSON([
-            'improved_text' => $improvedText,
-            'lsm_meta_sync' => true,
-        ]);
-    }
-
-    private function buildTemporarySuggestion(string $text): string
-    {
-        return 'Improved version: ' . ucfirst($text);
+        return $this->response->setJSON(['improved_text' => $improved]);
     }
 }

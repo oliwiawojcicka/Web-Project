@@ -1,56 +1,37 @@
 <?= $this->extend('layouts/base') ?>
-
 <?= $this->section('content') ?>
 
-    <section class="auth-wrapper">
+<section class="auth-wrapper">
+    <div class="auth-card">
+        <h1><?= lang('App.sign_in_title') ?></h1>
 
-        <div class="auth-card">
+        <?php if (session()->getFlashdata('success')): ?>
+            <div class="alert-success"><?= esc(session()->getFlashdata('success')) ?></div>
+        <?php endif; ?>
+        <?php if (session('errors.login')): ?>
+            <div class="alert-error"><?= esc(session('errors.login')) ?></div>
+        <?php endif; ?>
 
-            <h1>Sign In</h1>
+        <form action="/sign-in" method="post">
+            <?= csrf_field() ?>
 
-            <?php if (session('errors.login')) : ?>
-                <div class="error-message">
-                    <?= session('errors.login') ?>
-                </div>
-            <?php endif ?>
+            <label for="email"><?= lang('App.label_email') ?></label>
+            <input type="email" id="email" name="email" value="<?= old('email') ?>" required>
+            <?php if (session('errors.email')): ?>
+                <span class="field-error"><?= esc(session('errors.email')) ?></span>
+            <?php endif; ?>
 
-            <form action="/sign-in" method="post">
+            <label for="password"><?= lang('App.label_password') ?></label>
+            <input type="password" id="password" name="password" required>
 
-                <?= csrf_field() ?>
+            <button type="submit" class="btn btn-primary full-width"><?= lang('App.btn_sign_in') ?></button>
+        </form>
 
-                <label>Email</label>
-
-                <input
-                        type="email"
-                        name="email"
-                        value="<?= old('email') ?>"
-                        required
-                >
-                <?php if (session('errors.email')) : ?>
-                    <span class="error-message"><?= session('errors.email') ?></span>
-                <?php endif ?>
-
-                <label>Password</label>
-
-                <input
-                        type="password"
-                        name="password"
-                        required
-                >
-
-                <button type="submit" class="btn btn-primary full-width">
-                    Sign In
-                </button>
-
-            </form>
-
-            <p class="auth-link">
-                Don’t have an account?
-                <a href="/sign-up">Create one</a>
-            </p>
-
-        </div>
-
-    </section>
+        <p class="auth-link">
+            <?= lang('App.auth_no_account') ?>
+            <a href="/sign-up"><?= lang('App.auth_create_one') ?></a>
+        </p>
+    </div>
+</section>
 
 <?= $this->endSection() ?>

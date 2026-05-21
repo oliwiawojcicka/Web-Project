@@ -1,67 +1,51 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Edit Post | LSMiniSocial</title>
-    <link rel="stylesheet" href="<?= base_url('assets/css/home.css') ?>">
-</head>
-<body>
-<nav class="navbar">
-    <h1>LSMiniSocial</h1>
-    <div>
-        <a href="/home" class="<?= uri_string() === 'home' ? 'active' : '' ?>">Home</a>
-        <a href="/post/create" class="<?= uri_string() === 'post/create' ? 'active' : '' ?>">Create Post</a>
-        <a href="/profile" class="<?= uri_string() === 'profile' ? 'active' : '' ?>">Profile</a>
-        <a href="/logout">Logout</a>
-    </div>
-</nav>
+<?= $this->extend('layouts/base') ?>
 
-<main class="feed-container">
+<?= $this->section('content') ?>
+<div class="feed-container container">
 
     <?php if (session()->getFlashdata('error')): ?>
-        <div class="alert-error">
-            <?= esc(session()->getFlashdata('error')) ?>
-        </div>
-    <?php endif; ?>
-
-    <?php if (session()->getFlashdata('success')): ?>
-        <div class="alert-success">
-            <?= esc(session()->getFlashdata('success')) ?>
-        </div>
+        <div class="alert-error"><?= esc(session()->getFlashdata('error')) ?></div>
     <?php endif; ?>
 
     <section class="create-post-box">
-        <h2>Edit post</h2>
-        <p>Update the content of your post. Only the owner of the post should be allowed to edit it.</p>
+        <h2><?= lang('App.edit_title') ?></h2>
 
-        <form action="/posts/<?= esc($post['id'] ?? $postId ?? '') ?>" method="post" enctype="multipart/form-data">
+        <form action="/posts/<?= esc($post['id']) ?>" method="post">
+            <?= csrf_field() ?>
             <input type="hidden" name="_method" value="PUT">
 
-            <label for="content">Post content</label>
-            <textarea id="content" name="content" required><?= esc($post['content'] ?? old('content') ?? ('This is the current content of post #' . ($postId ?? ''))) ?></textarea>
-
-            <label for="image">Change image optional</label>
-            <input id="image" type="file" name="image">
+            <label for="content"><?= lang('App.label_post_content') ?></label>
+            <textarea id="content" name="content" required><?= esc($post['content'] ?? old('content')) ?></textarea>
 
             <?php if (! empty($post['image'])): ?>
-                <img
-                        class="post-image"
-                        src="<?= base_url($post['image']) ?>"
-                        alt="Current post image"
-                >
+                <p style="color:var(--text-muted);font-size:.85rem;margin-top:12px;"><?= lang('App.current_image') ?></p>
+                <img class="post-image" src="<?= base_url($post['image']) ?>" alt="Current post image">
             <?php endif; ?>
 
             <div class="post-actions">
-                <button type="button" class="secondary-button" data-ai-improve data-target="content">
-                    Improve with AI
-                </button>
-                <button type="submit">Save changes</button>
-                <a href="/home" class="button-link secondary-button">Cancel</a>
+                <button type="button" class="btn btn-secondary" id="ai-improve-btn"><?= lang('App.btn_improve_ai') ?></button>
+                <button type="submit" class="btn btn-primary"><?= lang('App.btn_save') ?></button>
+                <a href="/home" class="btn btn-secondary"><?= lang('App.btn_cancel') ?></a>
             </div>
         </form>
-    </section>
-</main>
 
+        <div id="ai-suggestion-box" style="display:none;" class="ai-suggestion">
+            <p><strong><?= lang('App.ai_suggestion') ?></strong></p>
+            <p id="ai-suggestion-text"></p>
+            <div class="post-actions">
+                <button type="button" class="btn btn-primary" id="ai-accept-btn"><?= lang('App.btn_accept') ?></button>
+                <button type="button" class="btn btn-secondary" id="ai-reject-btn"><?= lang('App.btn_reject') ?></button>
+            </div>
+        </div>
+    </section>
+
+</div>
+<?= $this->endSection() ?>
+
+<?= $this->section('scripts') ?>
+<script>
+    const CSRF_NAME = '<?= csrf_token() ?>';
+    const CSRF_HASH = '<?= csrf_hash() ?>';
+</script>
 <script src="<?= base_url('assets/js/ai-improve.js') ?>"></script>
-</body>
-</html>
+<?= $this->endSection() ?>

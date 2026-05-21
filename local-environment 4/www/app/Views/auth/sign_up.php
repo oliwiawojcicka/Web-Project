@@ -1,74 +1,45 @@
 <?= $this->extend('layouts/base') ?>
-
 <?= $this->section('content') ?>
 
-    <section class="auth-wrapper">
+<section class="auth-wrapper">
+    <div class="auth-card">
+        <h1><?= lang('App.sign_up_title') ?></h1>
 
-        <div class="auth-card">
+        <form action="/sign-up" method="post" enctype="multipart/form-data">
+            <?= csrf_field() ?>
 
-            <h1>Create account</h1>
+            <label for="username"><?= lang('App.label_username') ?> <span class="optional">(<?= lang('App.optional') ?>)</span></label>
+            <input type="text" id="username" name="username" value="<?= old('username') ?>">
 
-            <form
-                action="/sign-up"
-                method="post"
-                enctype="multipart/form-data"
-            >
+            <label for="profile_pic"><?= lang('App.label_profile_pic') ?> <span class="optional">(<?= lang('App.optional') ?>)</span></label>
+            <input type="file" id="profile_pic" name="profile_pic" accept="image/*">
 
-                <?= csrf_field() ?>
+            <label for="email"><?= lang('App.label_email') ?></label>
+            <input type="email" id="email" name="email" value="<?= old('email') ?>" required>
+            <?php if (session('errors.email')): ?>
+                <span class="field-error"><?= esc(session('errors.email')) ?></span>
+            <?php endif; ?>
 
-                <label>Username</label>
+            <label for="password"><?= lang('App.label_password') ?></label>
+            <input type="password" id="password" name="password" required>
+            <?php if (session('errors.password')): ?>
+                <span class="field-error"><?= esc(session('errors.password')) ?></span>
+            <?php endif; ?>
 
-                <input
-                    type="text"
-                    name="username"
-                    value="<?= old('username') ?>"
-                >
+            <label for="repeat_password"><?= lang('App.label_repeat_password') ?></label>
+            <input type="password" id="repeat_password" name="repeat_password" required>
+            <?php if (session('errors.repeat_password')): ?>
+                <span class="field-error"><?= esc(session('errors.repeat_password')) ?></span>
+            <?php endif; ?>
 
-                <label>Profile picture</label>
+            <button type="submit" class="btn btn-primary full-width"><?= lang('App.btn_sign_up') ?></button>
+        </form>
 
-                <input
-                    type="file"
-                    name="profile_picture"
-                >
-
-                <label>Email</label>
-
-                <input
-                    type="email"
-                    name="email"
-                    value="<?= old('email') ?>"
-                    required
-                >
-
-                <label>Password</label>
-
-                <input
-                    type="password"
-                    name="password"
-                    required
-                >
-
-                <label>Repeat password</label>
-
-                <input
-                    type="password"
-                    name="repeat_password"
-                    required
-                >
-
-                <button type="submit" class="btn btn-primary full-width">
-                    Sign Up
-                </button>
-
-            </form>
-
-            <p class="auth-link">
-                Already have an account?
-                <a href="/sign-in">Sign in</a>
-            </p>
-
-        </div>
-
-    </section>
+        <p class="auth-link">
+            <?= lang('App.auth_have_account') ?>
+            <a href="/sign-in"><?= lang('App.auth_sign_in_link') ?></a>
+        </p>
+    </div>
+</section>
 
 <?= $this->endSection() ?>

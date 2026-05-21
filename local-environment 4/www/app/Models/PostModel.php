@@ -3,8 +3,9 @@
 namespace App\Models;
 
 use CodeIgniter\Model;
+use App\Interfaces\PostRepositoryInterface;
 
-class PostModel extends Model
+class PostModel extends Model implements PostRepositoryInterface
 {
     protected $table            = 'posts';
     protected $primaryKey       = 'id';
@@ -12,35 +13,46 @@ class PostModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields = ['user_id', 'content', 'image'];
+    protected $allowedFields    = ['user_id', 'content', 'image'];
 
-    protected bool $allowEmptyInserts = false;
-    protected bool $updateOnlyChanged = true;
-
-    protected array $casts = [];
-    protected array $castHandlers = [];
-
-    // Dates
     protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
-    protected $deletedField  = 'deleted_at';
 
-    // Validation
-    protected $validationRules      = [];
-    protected $validationMessages   = [];
-    protected $skipValidation       = false;
-    protected $cleanValidationRules = true;
+    // ── Interface methods ─────────────────────────────────────────────────────
 
-    // Callbacks
-    protected $allowCallbacks = true;
-    protected $beforeInsert   = [];
-    protected $afterInsert    = [];
-    protected $beforeUpdate   = [];
-    protected $afterUpdate    = [];
-    protected $beforeFind     = [];
-    protected $afterFind      = [];
-    protected $beforeDelete   = [];
-    protected $afterDelete    = [];
+    public function getAllWithAuthors(): array
+    {
+        return $this->select('posts.*, users.username, users.profile_pic')
+            ->join('users', 'users.id = posts.user_id', 'left')
+            ->orderBy('posts.created_at', 'DESC')
+            ->findAll();
+    }
+
+    public function findWithAuthor(int $id): ?array
+    {
+        return $this->select('posts.*, users.username, users.profile_pic')
+            ->join('users', 'users.id = posts.user_id', 'left')
+            ->find($id);
+    }
+
+    public function createPost(int $userId, string $content, ?string $image): int
+    {
+        return $this->insert([
+            'user_id' => $userId,
+            'content' => $content,
+            'image'   => $image,
+        ], true);
+    }
+
+    public function updatePost(int $id, string $content): bool
+    {
+        return $this->update($id, ['content' => $content]);
+    }
+
+    public function deletePost(int $id): bool
+    {
+        return $this->delete($id);
+    }
 }
