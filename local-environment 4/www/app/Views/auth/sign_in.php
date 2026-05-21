@@ -2,46 +2,55 @@
 
 <?= $this->section('content') ?>
 
-<section class="auth-wrapper">
+    <section class="auth-wrapper">
 
-    <div class="auth-card">
+        <div class="auth-card">
 
-        <h1>Sign In</h1>
+            <h1>Sign In</h1>
 
-        <form action="/sign-in" method="post">
+            <?php if (session('errors.login')) : ?>
+                <div class="error-message">
+                    <?= session('errors.login') ?>
+                </div>
+            <?php endif ?>
 
-            <?= csrf_field() ?>
+            <form action="/sign-in" method="post">
 
-            <label>Email</label>
+                <?= csrf_field() ?>
 
-            <input
-                type="email"
-                name="email"
-                value="<?= old('email') ?>"
-                required
-            >
+                <label>Email</label>
 
-            <label>Password</label>
+                <input
+                        type="email"
+                        name="email"
+                        value="<?= old('email') ?>"
+                        required
+                >
+                <?php if (session('errors.email')) : ?>
+                    <span class="error-message"><?= session('errors.email') ?></span>
+                <?php endif ?>
 
-            <input
-                type="password"
-                name="password"
-                required
-            >
+                <label>Password</label>
 
-            <button type="submit" class="btn btn-primary full-width">
-                Sign In
-            </button>
+                <input
+                        type="password"
+                        name="password"
+                        required
+                >
 
-        </form>
+                <button type="submit" class="btn btn-primary full-width">
+                    Sign In
+                </button>
 
-        <p class="auth-link">
-            Don’t have an account?
-            <a href="/sign-up">Create one</a>
-        </p>
+            </form>
 
-    </div>
+            <p class="auth-link">
+                Don’t have an account?
+                <a href="/sign-up">Create one</a>
+            </p>
 
-</section>
+        </div>
+
+    </section>
 
 <?= $this->endSection() ?>

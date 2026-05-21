@@ -14,8 +14,13 @@
         <a href="/" class="logo">LSMiniSocial</a>
 
         <nav>
-            <a href="/sign-in">Sign In</a>
-            <a href="/sign-up">Sign Up</a>
+            <?php if (session()->get('isLoggedIn')) : ?>
+                <a href="/home">Dashboard</a>
+                <a href="/logout">Log Out</a>
+            <?php else : ?>
+                <a href="/sign-in">Sign In</a>
+                <a href="/sign-up">Sign Up</a>
+            <?php endif; ?>
         </nav>
     </div>
 </header>
