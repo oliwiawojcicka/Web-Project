@@ -14,7 +14,6 @@ class AuthFilter implements FilterInterface
             return redirect()->to('/sign-in')->with('errors', ['login' => 'You must be logged in to access this page.']);
         }
     }
-
     public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)
     {
 

@@ -62,7 +62,6 @@ class CommentController extends BaseController
             'comments_count' => $commentModel->countForPost($postId),
         ]);
     }
-
     // Delete a user's comment
     public function delete(int $id)
     {
@@ -83,7 +82,6 @@ class CommentController extends BaseController
         }
 
         $commentModel->delete($id);
-
         return $this->response->setJSON([
             'success'        => true,
             'comments_count' => $commentModel->countForPost((int) $comment['post_id']),
