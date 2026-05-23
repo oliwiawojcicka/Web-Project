@@ -6,42 +6,36 @@ use App\Models\UserModel;
 
 class AuthController extends BaseController
 {
-    private function isLoggedIn(): bool
+    private UserModel $userModel;
+
+    public function __construct()
     {
-        return (bool) session()->get('isLoggedIn');
+        $this->userModel = new UserModel();
     }
 
-    private function redirectIfAuthenticated(): ?\CodeIgniter\HTTP\RedirectResponse
-    {
-        return $this->isLoggedIn() ? redirect()->to('/home') : null;
-    }
+    // -------------------------------------------------------------------------
+    // Views
+    // -------------------------------------------------------------------------
 
     public function signUp()
     {
-        if ($redirect = $this->redirectIfAuthenticated()) {
-            return $redirect;
-        }
-
-        return view('auth/sign_up', ['title' => 'Sign Up']);
+        return $this->redirectIfAuthenticated()
+            ?? view('auth/sign_up', ['title' => 'Sign Up']);
     }
 
     public function signIn()
     {
-        if ($redirect = $this->redirectIfAuthenticated()) {
-            return $redirect;
-        }
-
-        return view('auth/sign_in', ['title' => 'Sign In']);
+        return $this->redirectIfAuthenticated()
+            ?? view('auth/sign_in', ['title' => 'Sign In']);
     }
+
+    // -------------------------------------------------------------------------
+    // Form handlers
+    // -------------------------------------------------------------------------
 
     public function signUpPost()
     {
-        $data = $this->getSignUpInput();
-
-        $errors = array_merge(
-            $this->validateEmail($data['email']),
-            $this->validatePassword($data['password'], $data['repeatPassword'])
-        );
+        [$data, $errors] = $this->parseAndValidateSignUp();
 
         if (! empty($errors)) {
             return redirect()->back()->withInput()->with('errors', $errors);
@@ -49,7 +43,8 @@ class AuthController extends BaseController
 
         $this->registerUser($data);
 
-        return redirect()->to('/sign-in')->with('success', 'Account created successfully. You can now sign in.');
+        return redirect()->to('/sign-in')
+            ->with('success', 'Account created successfully. You can now sign in.');
     }
 
     public function signInPost()
@@ -63,9 +58,9 @@ class AuthController extends BaseController
             ]);
         }
 
-        $user = (new UserModel())->where('email', $email)->first();
+        $user = $this->userModel->where('email', $email)->first();
 
-        // Single vague error message intentionally avoids confirming whether the email exists
+        // Intentionally vague — avoids leaking whether an email is registered
         if (! $user || ! password_verify($password, $user['password'])) {
             return redirect()->back()->withInput()->with('errors', [
                 'login' => 'Your email and/or password are incorrect.',
@@ -84,7 +79,6 @@ class AuthController extends BaseController
     public function signOut()
     {
         session()->destroy();
-
         return redirect()->to('/');
     }
 
@@ -92,14 +86,26 @@ class AuthController extends BaseController
     // Private helpers
     // -------------------------------------------------------------------------
 
-    private function getSignUpInput(): array
+    private function redirectIfAuthenticated()
     {
-        return [
+        return session()->get('isLoggedIn') ? redirect()->to('/home') : null;
+    }
+
+    private function parseAndValidateSignUp(): array
+    {
+        $data = [
             'email'          => trim((string) $this->request->getPost('email')),
             'password'       => (string) $this->request->getPost('password'),
             'repeatPassword' => (string) $this->request->getPost('repeat_password'),
             'username'       => trim((string) $this->request->getPost('username')),
         ];
+
+        $errors = array_merge(
+            $this->validateEmail($data['email']),
+            $this->validatePassword($data['password'], $data['repeatPassword'])
+        );
+
+        return [$data, $errors];
     }
 
     private function validateEmail(string $email): array
@@ -108,18 +114,19 @@ class AuthController extends BaseController
             return ['email' => 'The email address is not valid.'];
         }
 
-        if (! preg_match('/@(students\.salle\.url\.edu|ext\.salle\.url\.edu|salle\.url\.edu)$/', $email)) {
+        $allowedDomains = '/@(students\.salle\.url\.edu|ext\.salle\.url\.edu|salle\.url\.edu)$/';
+        if (! preg_match($allowedDomains, $email)) {
             return ['email' => 'Only emails from the domain @students.salle.url.edu, @ext.salle.url.edu or @salle.url.edu are accepted.'];
         }
 
-        if ((new UserModel())->where('email', $email)->first()) {
+        if ($this->userModel->where('email', $email)->first()) {
             return ['email' => 'The email address is already registered.'];
         }
 
         return [];
     }
 
-    private function validatePassword(string $password, string $repeatPassword): array
+    private function validatePassword(string $password, string $repeat): array
     {
         $errors = [];
 
@@ -129,7 +136,7 @@ class AuthController extends BaseController
             $errors['password'] = 'The password must contain both upper and lower case letters and numbers.';
         }
 
-        if ($password !== $repeatPassword) {
+        if ($password !== $repeat) {
             $errors['repeat_password'] = 'Passwords do not match.';
         }
 
@@ -140,19 +147,17 @@ class AuthController extends BaseController
     {
         $username = $data['username'] !== ''
             ? $data['username']
-            : explode('@', $data['email'])[0]; // fall back to email local part
+            : explode('@', $data['email'])[0];
 
-        $profilePic = $this->handleProfilePicUpload();
-
-        (new UserModel())->save([
+        $this->userModel->save([
             'username'    => $username,
             'email'       => $data['email'],
             'password'    => password_hash($data['password'], PASSWORD_DEFAULT),
-            'profile_pic' => $profilePic,
+            'profile_pic' => $this->uploadProfilePic(),
         ]);
     }
 
-    private function handleProfilePicUpload(): string
+    private function uploadProfilePic(): string
     {
         $image = $this->request->getFile('profile_pic');
 
