@@ -8,22 +8,22 @@ use App\Models\CommentModel;
 
 class PostController extends BaseController
 {
-    // Show the post creation form
     public function create()
     {
         return view('posts/create', ['title' => 'Create Post']);
     }
 
-    // Show the post edit form
     public function edit(int $id)
     {
         $postModel = new PostModel();
         $post      = $postModel->find($id);
 
+        // Abort if post doesn't exist
         if (! $post) {
             return redirect()->to('/home')->with('error', 'Post not found.');
         }
 
+        // Only the owner can edit
         if ((int) $post['user_id'] !== (int) session()->get('user_id')) {
             return redirect()->to('/home')->with('error', 'You can only edit your own posts.');
         }
@@ -31,9 +31,9 @@ class PostController extends BaseController
         return view('posts/edit', ['title' => 'Edit Post', 'post' => $post]);
     }
 
-    // Fetch all posts (useful for AJAX feeds)
     public function index()
     {
+        // Guard: only logged-in users can fetch the feed
         if (! session()->get('isLoggedIn')) {
             return $this->response->setStatusCode(401)->setJSON(['error' => 'Unauthorized.']);
         }
@@ -45,6 +45,7 @@ class PostController extends BaseController
 
         $posts = $postModel->getAllWithAuthors();
 
+        // Attach engagement counters and like state to each post
         foreach ($posts as &$post) {
             $post['likes_count']    = $likeModel->countForPost((int) $post['id']);
             $post['comments_count'] = $commentModel->countForPost((int) $post['id']);
@@ -54,9 +55,9 @@ class PostController extends BaseController
         return $this->response->setJSON($posts);
     }
 
-    // Save a new post
     public function store()
     {
+        // Guard: reject unauthenticated requests
         if (! session()->get('isLoggedIn')) {
             return $this->response->setStatusCode(401)->setJSON(['error' => 'Unauthorized.']);
         }
@@ -70,7 +71,7 @@ class PostController extends BaseController
             return redirect()->back()->withInput()->with('error', 'Post content cannot be empty.');
         }
 
-        // Handle optional post image upload
+        // Handle optional image – move to public uploads dir if provided
         $imagePath = null;
         $image     = $this->request->getFile('image');
 
@@ -91,7 +92,6 @@ class PostController extends BaseController
         return redirect()->to('/home')->with('success', 'Post created successfully.');
     }
 
-    // Fetch details for a single post
     public function show(int $id)
     {
         if (! session()->get('isLoggedIn')) {
@@ -109,6 +109,7 @@ class PostController extends BaseController
         $commentModel = new CommentModel();
         $userId       = (int) session()->get('user_id');
 
+        // Enrich single post with engagement data
         $post['likes_count']    = $likeModel->countForPost($id);
         $post['comments_count'] = $commentModel->countForPost($id);
         $post['liked_by_user']  = $likeModel->hasLiked($userId, $id);
@@ -116,7 +117,6 @@ class PostController extends BaseController
         return $this->response->setJSON($post);
     }
 
-    // Update an existing post
     public function update(int $id)
     {
         if (! session()->get('isLoggedIn')) {
@@ -130,15 +130,16 @@ class PostController extends BaseController
             return $this->response->setStatusCode(404)->setJSON(['error' => 'Post not found.']);
         }
 
+        // Ownership check – prevent editing other users' posts
         if ((int) $post['user_id'] !== (int) session()->get('user_id')) {
             return $this->response->setStatusCode(403)->setJSON(['error' => 'You can only edit your own posts.']);
         }
 
+        // Support both JSON and form-encoded bodies
         $json = null;
         if (str_contains(strtolower($this->request->getHeaderLine('Content-Type')), 'json')) {
             $json = $this->request->getJSON(true);
         }
-
 
         $rawInput = $this->request->getRawInput();
         $content  = trim((string) ($json['content'] ?? $rawInput['content'] ?? $this->request->getPost('content') ?? ''));
@@ -159,7 +160,6 @@ class PostController extends BaseController
         return redirect()->to('/home')->with('success', 'Post updated successfully.');
     }
 
-    // Delete a post
     public function delete(int $id)
     {
         if (! session()->get('isLoggedIn')) {
@@ -173,6 +173,7 @@ class PostController extends BaseController
             return $this->response->setStatusCode(404)->setJSON(['error' => 'Post not found.']);
         }
 
+        // Only the owner may delete their post
         if ((int) $post['user_id'] !== (int) session()->get('user_id')) {
             return $this->response->setStatusCode(403)->setJSON(['error' => 'You can only delete your own posts.']);
         }
