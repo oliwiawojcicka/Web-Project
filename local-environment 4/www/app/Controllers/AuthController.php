@@ -6,9 +6,9 @@ use App\Models\UserModel;
 
 class AuthController extends BaseController
 {
-    // Show the sign-up form
     public function signUp()
     {
+        // Redirect already-authenticated users away from the form
         if (session()->get('isLoggedIn')) {
             return redirect()->to('/home');
         }
@@ -16,7 +16,6 @@ class AuthController extends BaseController
         return view('auth/sign_up', ['title' => 'Sign Up']);
     }
 
-    // Handle new user registration
     public function signUpPost()
     {
         $email          = trim((string) $this->request->getPost('email'));
@@ -25,7 +24,7 @@ class AuthController extends BaseController
         $username       = trim((string) $this->request->getPost('username'));
         $errors         = [];
 
-        // Validate email format and domain
+        // Validate email format, then restrict to allowed institutional domains
         if (! filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $errors['email'] = 'The email address is not valid.';
         } elseif (! preg_match('/@(students\.salle\.url\.edu|ext\.salle\.url\.edu|salle\.url\.edu)$/', $email)) {
@@ -37,7 +36,7 @@ class AuthController extends BaseController
             }
         }
 
-        // Validate password strength
+        // Enforce minimum length and character-class requirements
         if (strlen($password) < 8) {
             $errors['password'] = 'The password must contain at least 8 characters.';
         } elseif (! preg_match('/[A-Z]/', $password) || ! preg_match('/[a-z]/', $password) || ! preg_match('/[0-9]/', $password)) {
@@ -52,12 +51,12 @@ class AuthController extends BaseController
             return redirect()->back()->withInput()->with('errors', $errors);
         }
 
-        // Use part of the email as the default username if none is provided
+        // Fall back to the local part of the email when no username is supplied
         if ($username === '') {
             $username = explode('@', $email)[0];
         }
 
-        // Handle optional profile picture upload
+        // Move uploaded profile picture; keep default.png if none provided
         $profilePic = 'default.png';
         $image      = $this->request->getFile('profile_pic');
         if ($image && $image->isValid() && ! $image->hasMoved()) {
@@ -70,16 +69,16 @@ class AuthController extends BaseController
         $userModel->save([
             'username'    => $username,
             'email'       => $email,
-            'password'    => password_hash($password, PASSWORD_DEFAULT),
+            'password'    => password_hash($password, PASSWORD_DEFAULT), // never store plaintext
             'profile_pic' => $profilePic,
         ]);
 
         return redirect()->to('/sign-in')->with('success', 'Account created successfully. You can now sign in.');
     }
 
-    // Show the sign-in form
     public function signIn()
     {
+        // Redirect already-authenticated users away from the form
         if (session()->get('isLoggedIn')) {
             return redirect()->to('/home');
         }
@@ -87,7 +86,6 @@ class AuthController extends BaseController
         return view('auth/sign_in', ['title' => 'Sign In']);
     }
 
-    // Handle login attempt
     public function signInPost()
     {
         $email    = trim((string) $this->request->getPost('email'));
@@ -102,14 +100,14 @@ class AuthController extends BaseController
         $userModel = new UserModel();
         $user      = $userModel->where('email', $email)->first();
 
-        // Check if user exists and password is correct
+        // Single vague error message intentionally avoids confirming whether the email exists
         if (! $user || ! password_verify($password, $user['password'])) {
             return redirect()->back()->withInput()->with('errors', [
                 'login' => 'Your email and/or password are incorrect.',
             ]);
         }
 
-        // Set session data
+        // Persist minimal identity data in the session
         session()->set([
             'user_id'    => $user['id'],
             'username'   => $user['username'],
@@ -119,9 +117,9 @@ class AuthController extends BaseController
         return redirect()->to('/home');
     }
 
-    // Log the user out and destroy the session
     public function signOut()
     {
+        // Wipe the entire session on logout
         session()->destroy();
 
         return redirect()->to('/');
