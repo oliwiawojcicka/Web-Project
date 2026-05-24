@@ -1,7 +1,8 @@
 <?= $this->extend('layouts/base') ?>
 <?= $this->section('content') ?>
 
-<section class="hero">
+<!-- Dodano id="hero" -->
+<section id="hero" class="hero">
     <div class="hero-content">
         <h1><?= lang('App.landing_title') ?></h1>
         <p><?= lang('App.landing_subtitle') ?></p>
@@ -12,7 +13,8 @@
     </div>
 </section>
 
-<section class="features container">
+<!-- Dodano id="features" -->
+<section id="features" class="features container">
     <article class="feature-card">
         <h2><?= lang('App.feature_posts_title') ?></h2>
         <p><?= lang('App.feature_posts_desc') ?></p>
